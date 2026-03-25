@@ -1,5 +1,5 @@
 {
-  "name": "",
-  "description": "",
-  "requestFramePermissions": []
+  "name": "Krāču laivas",
+  "description": "Premium laivu un kanoe noma Latvijā. Augstas konversijas rezervācijas sistēma braucieniem pa Gauju un citām upēm.",
+  "requestFramePermissions": ["geolocation"]
 }

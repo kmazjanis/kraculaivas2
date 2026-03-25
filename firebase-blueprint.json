@@ -1,0 +1,62 @@
+{
+  "entities": {
+    "Route": {
+      "title": "Route",
+      "description": "A kayaking route offered by Krāču laivas.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Route name" },
+        "river": { "type": "string", "description": "River name" },
+        "duration": { "type": "string", "description": "Duration (e.g., 2h, half day)" },
+        "difficulty": { "type": "string", "enum": ["Easy", "Moderate", "Challenging"] },
+        "price": { "type": "number", "description": "Base price per person" },
+        "description": { "type": "string" },
+        "images": { "type": "array", "items": { "type": "string" } },
+        "mapUrl": { "type": "string" },
+        "schedule": { "type": "array", "items": { "type": "string" } },
+        "faq": { "type": "array", "items": { "type": "object", "properties": { "q": { "type": "string" }, "a": { "type": "string" } } } }
+      },
+      "required": ["name", "river", "duration", "price"]
+    },
+    "Booking": {
+      "title": "Booking",
+      "description": "A customer booking for a kayaking trip.",
+      "type": "object",
+      "properties": {
+        "routeId": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "participants": { "type": "integer", "description": "Number of people" },
+        "extras": { "type": "array", "items": { "type": "string" } },
+        "customerInfo": {
+          "type": "object",
+          "properties": {
+            "name": { "type": "string" },
+            "email": { "type": "string", "format": "email" },
+            "phone": { "type": "string" }
+          },
+          "required": ["name", "email", "phone"]
+        },
+        "totalPrice": { "type": "number" },
+        "status": { "type": "string", "enum": ["pending", "confirmed", "cancelled"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["routeId", "date", "participants", "customerInfo", "totalPrice", "status"]
+    },
+    "User": {
+      "title": "User",
+      "description": "App user profile.",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "format": "email" },
+        "name": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "customer"] }
+      },
+      "required": ["email", "role"]
+    }
+  },
+  "firestore": {
+    "/routes/{routeId}": { "schema": "Route", "description": "Available kayaking routes" },
+    "/bookings/{bookingId}": { "schema": "Booking", "description": "Customer bookings" },
+    "/users/{userId}": { "schema": "User", "description": "User profiles" }
+  }
+}

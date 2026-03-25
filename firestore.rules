@@ -1,0 +1,50 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: routes
+    // Fields: name, river, duration, difficulty, price, description, images, mapUrl, schedule, faq
+    //
+    // Collection: bookings
+    // Fields: routeId, date, participants, extras, customerInfo, totalPrice, status, createdAt
+    //
+    // Collection: users
+    // Fields: email, name, role
+    //
+    // ===============================================================
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && 
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+         request.auth.token.email == 'kmazjanis@gmail.com');
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    match /routes/{routeId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /bookings/{bookingId} {
+      allow create: if true; // Allow anyone to book
+      allow read: if isAdmin() || (isAuthenticated() && resource.data.customerInfo.email == request.auth.token.email);
+      allow update, delete: if isAdmin();
+    }
+
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+      allow update: if isOwner(userId) && (request.resource.data.role == resource.data.role || isAdmin());
+    }
+  }
+}
